@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tradutor com IA</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+    rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+
+    body {
+      background: radial-gradient(at 50% 0%, rgba(99, 102, 241, 0.08) 0px, transparent 50%),
+        radial-gradient(at 0% 0%, rgba(16, 185, 129, 0.05) 0px, transparent 50%),
+        #f8fafc;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+    }
+
+    header {
+      margin-bottom: 2.5rem;
+      text-align: center;
+    }
+
+    header h1 {
+      font-size: 2.75rem;
+      color: #0f172a;
+      font-weight: 700;
+      letter-spacing: -1px;
+      background: linear-gradient(135deg, #0f172a 0%, #4338ca 100%);
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .translator-container {
+      background-color: #ffffff;
+      border-radius: 24px;
+      border: 1px solid rgba(226, 232, 240, 0.8);
+      box-shadow: 0 20px 40px -15px rgba(15, 23, 42, 0.06),
+        0 0 0 1px rgba(15, 23, 42, 0.02);
+      width: 100%;
+      max-width: 640px;
+      padding: 2.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.75rem;
+    }
+
+    textarea {
+      width: 100%;
+      height: 160px;
+      padding: 1.25rem;
+      border: 1px solid #e2e8f0;
+      border-radius: 14px;
+      font-size: 1.05rem;
+      color: #334155;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+      background-color: #f8fafc;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    textarea:focus {
+      border-color: #4f46e5;
+      background-color: #ffffff;
+      box-shadow: 0 0 0 4px rgba(79, 70, 229, 0.1);
+    }
+
+    textarea::placeholder {
+      color: #94a3b8;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 1rem;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 0.875rem;
+      border: none;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+      color: white;
+    }
+
+    .btn svg {
+      width: 18px;
+      height: 18px;
+      fill: currentColor;
+    }
+
+    .btn:active {
+      transform: scale(0.98);
+    }
+
+    .btn-translate {
+      background-color: #10b981;
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+    }
+
+    .btn-translate:hover {
+      background-color: #059669;
+      box-shadow: 0 6px 16px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-copy {
+      background-color: #4f46e5;
+      box-shadow: 0 4px 12px rgba(79, 70, 229, 0.15);
+    }
+
+    .btn-copy:hover {
+      background-color: #4338ca;
+      box-shadow: 0 6px 16px rgba(79, 70, 229, 0.25);
+    }
+
+    .btn-clear {
+      background-color: #ef4444;
+      box-shadow: 0 4px 12px rgba(239, 68, 68, 0.15);
+    }
+
+    .btn-clear:hover {
+      background-color: #dc2626;
+      box-shadow: 0 6px 16px rgba(239, 68, 68, 0.25);
+    }
+
+    .output-area {
+      background-color: #f8fafc;
+      border: 1px dashed #cbd5e1;
+      border-radius: 14px;
+      padding: 1.5rem;
+      min-height: 140px;
+      color: #64748b;
+      font-size: 1.05rem;
+      line-height: 1.6;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+
+    /* Estilos do Contador de Requisições */
+    .counter-container {
+      text-align: right;
+      font-size: 0.85rem;
+      color: #64748b;
+      font-weight: 500;
+      margin-top: -0.5rem;
+      padding-right: 4px;
+    }
+
+    #request-counter {
+      color: #4f46e5;
+      font-weight: 700;
+    }
+
+    /* Estilos do Novo Modal/Toast de Cópia */
+    .toast-modal {
+      position: fixed;
+      top: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-20px);
+      background-color: #0f172a;
+      color: #ffffff;
+      padding: 0.75rem 1.5rem;
+      border-radius: 50px;
+      font-weight: 500;
+      font-size: 0.95rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.3);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 9999;
+    }
+
+    .toast-modal.show {
+      transform: translateX(-50%) translateY(0);
+      opacity: 1;
+      visibility: visible;
+    }
+
+    .toast-modal svg {
+      width: 18px;
+      height: 18px;
+      fill: #10b981;
+    }
+  </style>
+</head>
+
+<body>
+
+  <header>
+    <h1>Tradutor com IA</h1>
+  </header>
+
+  <main class="translator-container">
+    <textarea id="input-text" placeholder="Digite ou cole o texto que deseja traduzir..."></textarea>
+
+    <div class="button-group">
+      <button id="btn-translate" class="btn btn-translate">
+        <svg viewBox="0 0 24 24">
+          <path
+            d="M12.87 15.07l-2.54-2.51.03-.03c1.74-1.94 2.98-4.17 3.71-6.53H17V4h-7V2H8v2H1v2h11.17C11.5 7.92 10.44 9.75 9 11.35 8.07 10.32 7.3 9.19 6.69 8h-2c.73 1.63 1.73 3.17 2.98 4.56l-5.09 5.02L4 19l5-5 3.11 3.11.76-2.04zM18.5 10h-2L12 22h2l1.12-3h4.75L21 22h2l-4.5-12zm-2.62 7l1.62-4.33L19.12 17h-3.24z" />
+        </svg>
+        Traduzir
+      </button>
+
+      <button id="btn-copy" class="btn btn-copy">
+        <svg viewBox="0 0 24 24">
+          <path d="M16 1H4c-1.1 0-2 .9-2 2v14h2V3h12V1zm3 4H8c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h11c1.1 0 2-.9 2-2V7c0-1.1-.9-2-2-2zm0 16H8V7h11v14z"/>
+        </svg>
+        Copiar
+      </button>
+
+      <button id="btn-clear" class="btn btn-clear">
+        <svg viewBox="0 0 24 24">
+          <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+        </svg>
+        Apagar
+      </button>
+    </div>
+
+    <div id="output-area" class="output-area">
+      Sua tradução aparecerá bem aqui
+    </div>
+
+    <div class="counter-container">
+      Uso diário: <span id="request-counter">0</span> / 1500
+    </div>
+  </main>
+
+  <div id="toast-modal" class="toast-modal">
+    <svg viewBox="0 0 24 24">
+      <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
+    </svg>
+    <span>Copiado com sucesso!</span>
+  </div>
+
+  <script src="build/main.js" type="module" defer></script>
+
+</body>
+
+</html>

@@ -1,0 +1,1 @@
+export const tratarDados = (dados: string): string => dados.trim()
